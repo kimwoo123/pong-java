@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import io.jsonwebtoken.*;
 
 import java.io.IOException;
@@ -54,12 +55,21 @@ public class OAuthService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
     public UserInfo saveUserInfo(UserInfo userInfo) {
 //        System.out.println("Id: " + userInfo.getId() + "Login: " + userInfo.getLogin()
 //                + " Email: "+ userInfo.getEmail()
 //                + "Image: " + userInfo.getImage()
 //                + "Country: " + userInfo.getCountry());
-        return userRepository.save(userInfo);
+
+        redisTemplate.opsForValue().set(userInfo.getId() + "", userInfo);
+        if (!userRepository.existsById(userInfo.getId())) {
+            userRepository.save(userInfo);
+        }
+
+        return userInfo;
     }
 
     public void sendToApi(HttpServletResponse response) throws IOException {
