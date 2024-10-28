@@ -22,7 +22,7 @@ import java.util.Map;
 import com.example.board.repository.UserRepository;
 import com.example.board.entity.UserInfo;
 
-@PropertySource("/secret.properties")
+@PropertySource("classpath:secret.properties")
 @Service
 public class OAuthService {
 
@@ -99,6 +99,7 @@ public class OAuthService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
+        System.out.println("HERE::::" + url);
         ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
         if (response.getStatusCode() == HttpStatus.OK) {
             Map<String, String> tokens = new HashMap<>();
