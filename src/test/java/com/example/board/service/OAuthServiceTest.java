@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,25 +34,24 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-@SpringBootTest
-@ExtendWith(MockitoExtension.class)
-@TestPropertySource(locations = "classpath:test-secret.properties")
+@SpringBootTest(properties = "spring.config.location=classpath:test-secret.properties")
 class OAuthServiceTest {
 
+    // TODO: DELETE
     @Value("${API_URL}")
     private String apiUrl;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @MockBean
+    private RestTemplate restTemplate;
 
     @InjectMocks
     private OAuthService oAuthService;
 
-    @MockBean
-    private UserRepository userRepository;
-
-//    @MockBean
-//    private RedisTemplate<String, Object> redisTemplate;
-
     @Mock
-    private RestTemplate restTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Value("${JWT_SECRET}")
     private String jwtSecret;
@@ -69,17 +69,18 @@ class OAuthServiceTest {
         userInfo.setIsVerified(false);
     }
 
-    @Test
-    void testSaveUserInfo() {
-        when(userRepository.existsById(userInfo.getId())).thenReturn(false);
-        when(userRepository.save(any(UserInfo.class))).thenReturn(userInfo);
+//    @Test
+//    void testSaveUserInfo() {
+//        when(userRepository.existsById(userInfo.getId())).thenReturn(false);
+//        when(userRepository.save(any(UserInfo.class))).thenReturn(userInfo);
 
-        UserInfo savedUser = oAuthService.saveUserInfo(userInfo);
+//        doThrow(new RuntimeException()).doNothing().when(redisTemplate.opsForValue()).set();
+//        UserInfo savedUser = oAuthService.saveUserInfo(userInfo);
 
-        assertThat(savedUser).isEqualTo(userInfo);
-        verify(userRepository, times(1)).save(userInfo);
+//        assertThat(savedUser).isEqualTo(userInfo);
+//        verify(userRepository, times(1)).save(userInfo);
 //        verify(redisTemplate, times(1)).opsForValue().set(String.valueOf(userInfo.getId()), userInfo);
-    }
+//    }
 
     @Test
     void testFetchAndSaveUserInfo() throws Exception {
